@@ -1,23 +1,24 @@
-// server.mjs
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Load environment variables
 dotenv.config();
-
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Enable CORS for local dev and production frontend
-app.use(cors());
+// ✅ 开启 CORS —— 特别重要
+app.use(cors({
+  origin: "*", // 或写成 ["http://localhost:5173", "你的正式前端地址"]
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
-// Route to generate report
 app.post("/generate-report", async (req, res) => {
   try {
     const { recipient, platform, date, incidentTypes, notes } = req.body;
@@ -46,17 +47,15 @@ Format it as a short report suitable for sending to a school or authority figure
 
     res.status(200).json({ result: text });
   } catch (error) {
-    console.error("Error:", error);
+    console.error("❌ Internal Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Health check route
 app.get("/", (req, res) => {
-  res.send("Server is running!");
+  res.send("✅ Server is running.");
 });
 
-// Start server
 app.listen(port, () => {
   console.log(`✅ Server is running on port ${port}`);
 });
