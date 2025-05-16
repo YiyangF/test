@@ -11,12 +11,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Enable CORS for local dev and production frontend
-app.use(cors({
-  origin: ["http://localhost:5173", "https://your-frontend.railway.app"], // ✅ 可根据需要添加前端域名
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
-
+app.use(cors());
 app.use(express.json());
 
 const apiKey = process.env.GEMINI_API_KEY;
