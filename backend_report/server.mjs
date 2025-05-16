@@ -1,17 +1,19 @@
+// server.mjs
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ✅ 开启 CORS —— 特别重要
+// ✅ 核心 CORS 设置
 app.use(cors({
-  origin: "*", // 或写成 ["http://localhost:5173", "你的正式前端地址"]
+  origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type"]
 }));
 
 app.use(express.json());
@@ -45,6 +47,7 @@ Format it as a short report suitable for sending to a school or authority figure
     const response = await result.response;
     const text = response.text();
 
+    res.setHeader("Access-Control-Allow-Origin", "*"); // ✅ 再确保头部加上
     res.status(200).json({ result: text });
   } catch (error) {
     console.error("❌ Internal Error:", error);
@@ -52,10 +55,17 @@ Format it as a short report suitable for sending to a school or authority figure
   }
 });
 
+app.options("/generate-report", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.sendStatus(204);
+});
+
 app.get("/", (req, res) => {
-  res.send("✅ Server is running.");
+  res.send("Server is running!");
 });
 
 app.listen(port, () => {
-  console.log(`✅ Server is running on port ${port}`);
+  console.log(`✅ Server running on port ${port}`);
 });
